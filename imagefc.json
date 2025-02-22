@@ -1,0 +1,40 @@
+{
+    "model": "gpt-4o-mini",
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant."
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "上面所有图片一样吗，里面有什么内容"
+                }
+            ]
+        }
+    ],
+    "max_tokens": 2048,
+    "stream": true,
+    "temperature": 0.7,
+    "top_p": 1
+}
