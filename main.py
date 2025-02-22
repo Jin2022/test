@@ -15,7 +15,7 @@ class EmbeddingReranker:
             
         payload = {  
             "input": texts,  
-            "model": "xiaobu-embedding-v2"  # 固定使用这个模型  
+            "model": "bge-m3"  # 固定使用这个模型  
         }  
         
         try:  
