@@ -1,5 +1,3 @@
-
-# API配置
 from fastapi import FastAPI, Request, HTTPException  
 from fastapi.responses import JSONResponse, StreamingResponse  
 from fastapi.middleware.cors import CORSMiddleware  
@@ -18,7 +16,7 @@ class ChatRequest(BaseModel):
     }  
     pass  
 
-FORWARD_BASE_URL = "http://10.0.13.1:1025/v1/chat/completions"
+FORWARD_BASE_URL = "https://llm.bywin.cn:30663/api/aisp-smart-center/proxy-openai/v1/chat/completions"  
 API_KEY = "your-api-key-here"  
 FORWARD_HEADERS = {  
     "Authorization": f"Bearer {API_KEY}",  
@@ -137,7 +135,7 @@ class ContentProcessor:
     @staticmethod  
     def process_chat_response(response_data: dict) -> dict:  
         """  
-        处理chat completion响应，仅处理最后一条assistant消息中的第一个think标签内容  
+        处理chat completion响应，提取最后一条assistant消息中</think>前的内容  
         
         Args:  
             response_data (dict): 原始响应数据  
@@ -147,45 +145,29 @@ class ContentProcessor:
         """  
         if not isinstance(response_data, dict):  
             raise ValueError("响应数据必须是字典类型")  
+        
+        choices = response_data.get('choices', [])  
+        if not choices:  
+            return response_data  
             
-        try:  
-            choices = response_data.get('choices', [])  
-            if not choices:  
-                return response_data  
-                
-            # 获取最后一条消息  
-            last_choice = choices[-1]  
-            last_message = last_choice.get('message', {})  
-            content = last_message.get('content', '')  
-            if not content:  
-                return response_data  
-                
-            # 处理think标签 - 只处理第一个  
-            think_pattern = r'<think>(.*?)</think>'  
-            try:  
-                match = re.search(think_pattern, content, re.DOTALL)  
-                if match:  
-                    reasoning_content = match.group(1)  
-                    # 只替换第一个匹配项，通过count=1参数控制  
-                    cleaned_content = re.sub(think_pattern, '', content, count=1, flags=re.DOTALL).strip()  
-                else:  
-                    reasoning_content = ''  
-                    cleaned_content = content  
-                
-                # 更新最后一条消息的内容  
-                last_message['content'] = cleaned_content  
-                last_message['reasoning_content'] = reasoning_content  
-                
-            except re.error as e:  
-                logger.error(f"正则表达式处理失败: {str(e)}")  
-                # 保持原始内容不变  
-                last_message['content'] = content  
-                last_message['reasoning_content'] = ''  
-                
-        except Exception as e:  
-            logger.error(f"处理响应数据时发生错误: {str(e)}")  
-            raise  
+        last_message = choices[-1].get('message', {})  
+        content = last_message.get('content', '')  
+        
+        # 查找</think>的位置  
+        end_pos = content.find('</think>')  
+        if end_pos != -1:  
+            # 提取</think>之前的内容作为reasoning_content  
+            reasoning_content = content[:end_pos]  
+            # 如果reasoning_content以<think>开头，则移除  
+            if reasoning_content.startswith('<think>'):  
+                reasoning_content = reasoning_content[7:]  
             
+            # 保留</think>后的内容  
+            cleaned_content = content[end_pos + 8:].strip()  
+            
+            last_message['content'] = cleaned_content  
+            last_message['reasoning_content'] = reasoning_content  
+        
         return response_data  
 
 app = FastAPI()  
