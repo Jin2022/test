@@ -1,5 +1,5 @@
 {
-    "model": "gpt-4o-mini",
+    "model": "Qwen2-VL-7B-Instruct",
     "messages": [
         {
             "role": "system",
@@ -11,30 +11,41 @@
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
-                    }
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
-                    }
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+                        "url": "https://i1.sinaimg.cn/IT/2012/0717/U5009P2DT20120717094315.png"
                     }
                 },
                 {
                     "type": "text",
-                    "text": "上面所有图片一样吗，里面有什么内容"
+                    "text": "结果是多少"
                 }
             ]
         }
     ],
+    "tools": [
+        {
+            "type": "function",
+            "function": {
+                "name": "calculator",
+                "description": "科学计算函数，把需要计算的表达式输入并进行计算",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "expression": {
+                            "type": "string",
+                            "description": "需要计算的表达式"
+                        }
+                    },
+                    "required": [
+                        "expression"
+                    ]
+                }
+            }
+        }
+    ],
     "max_tokens": 2048,
-    "stream": true,
+    "n": 1,
+    "stream": false,
+    "stop": null,
     "temperature": 0.7,
     "top_p": 1
 }
